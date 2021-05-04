@@ -29,6 +29,7 @@ exports.handler = async (event, context) => {
         body = `Put item ${requestJSON.id}`;
         break;
       case "DELETE /items/{id}":
+        console.log(event.pathParameters.id)
         await dynamo
           .delete({
             TableName: "Products",
