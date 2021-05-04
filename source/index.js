@@ -8,11 +8,14 @@ exports.handler = async (event, context) => {
   const headers = {
     "Content-Type": "application/json"
   };
+  
+  
+  let requestJSON = JSON.parse(event.body);
 
   try {
     switch (event.routeKey) {
       case "POST /items":
-        let requestJSON = JSON.parse(event.body);
+        //let requestJSON = JSON.parse(event.body);
         await dynamo
           .put({
             TableName: "Products",
@@ -49,20 +52,20 @@ exports.handler = async (event, context) => {
       case "GET /items":
         body = await dynamo.scan({ TableName: "Products" }).promise();
         break;
-      case "PUT /items":
+      case "PUT /items/{id}":
         await dynamo
-          .put({
+          .update({
             TableName: "Products",
             Key: {
               id: event.pathParameters.id
             },
-            Item: {
-              price: requestJSON.price,
-              name: requestJSON.name
-            }
+            UpdateExpression: 'set price = :r',
+            ExpressionAttributeValues: {
+             ':r': requestJSON.price,
+            },
           })
           .promise();
-        body = `Put item ${requestJSON.id}`;
+        body = `Put item ${event.pathParameters.id}`;
         break;
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`);
