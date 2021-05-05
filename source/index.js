@@ -10,12 +10,12 @@ exports.handler = async (event, context) => {
   };
   
   
-  let requestJSON = JSON.parse(event.body);
+  let requestJSON;
 
   try {
     switch (event.routeKey) {
       case "POST /items":
-        //let requestJSON = JSON.parse(event.body);
+        requestJSON = JSON.parse(event.body);
         await dynamo
           .put({
             TableName: "Products",
@@ -54,6 +54,7 @@ exports.handler = async (event, context) => {
         body = await dynamo.scan({ TableName: "Products" }).promise();
         break;
       case "PUT /items/{id}":
+         requestJSON = JSON.parse(event.body);
         await dynamo
           .update({
             TableName: "Products",
